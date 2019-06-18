@@ -4,6 +4,7 @@
 import os
 import subprocess
 from flask import Flask
+from flask import render_template
 
 app = Flask(__name__)
 
@@ -45,3 +46,10 @@ Person *--1 `Birth Place`
     response = app.make_response(pobj.stdout.read())
     response.headers.set('Content-Type', 'image/png')
     return response
+
+@app.route('/erd')
+def index():
+    return render_template('erd.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
