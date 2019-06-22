@@ -4,6 +4,7 @@
 import os
 import subprocess
 import json
+import random
 
 from flask import Flask, redirect, request
 from flask import render_template
@@ -11,9 +12,6 @@ from flask import render_template
 app = Flask(__name__)
 
 default_erd_source = '''
-# Entities are declared in '[' ... ']'. All attributes after the entity header
-# up until the end of the file (or the next entity declaration) correspond
-# to this entity.
 [Person]
 *name
 height
@@ -27,15 +25,6 @@ weight
 'birth state'
 "birth country"
 
-# Each relationship must be between exactly two entities, which need not
-# be distinct. Each entity in the relationship has exactly one of four
-# possible cardinalities:
-#
-# Cardinality    Syntax
-# 0 or 1         ?
-# exactly 1      1
-# 0 or more      *
-# 1 or more      +
 Person *--1 `Birth Place`
 '''
 
@@ -46,6 +35,7 @@ def gen_image(source_code, image_path):
     )
     pobj.stdin.write(source_code.encode('utf-8'))
     pobj.stdin.close()
+    return
     response = app.make_response(pobj.stdout.read())
     response.headers.set('Content-Type', 'image/png')
     return response
@@ -57,12 +47,12 @@ def index():
 @app.route('/erds/<id>', methods=['GET', 'PUT'])
 def erd(id):
     if "PUT" == request.method:
-        obj = json.loads(request.get_json())
-        path = "./static/erd-images/" + obj.id # TODO
-        gen_image(obj.sourceCode, path)
+        obj = request.get_json() # TODO how to print debug log?
+        path = "./static/erd-images/" + obj["id"] + ".png" # TODO
+        gen_image(obj["sourceCode"], path)
 
         returnObj = {
-            "imageUri": '/static/erd-images/' + obj.id, # TODO
+            "imageUri": '/static/erd-images/' + obj["id"] + ".png?" + str(random.randrange(1000000)), # TODO
         }
         return json.dumps(returnObj)
     else:
@@ -74,4 +64,5 @@ def erd(id):
         return json.dumps(obj)
 
 if __name__ == '__main__':
+    random.seed()
     app.run(debug=True)

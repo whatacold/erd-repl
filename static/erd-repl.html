@@ -10,7 +10,7 @@
 
         <title>erd REPL</title>
     </head>
-    <body>
+    <body id="app-view" >
         <div class="container-fluid">
             <div class="row" id="erd-view" >
             </div>
@@ -21,7 +21,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">With textarea</span>
                 </div>
-                <textarea class="form-control" aria-label="With textarea"><%= sourceCode  %></textarea>
+                <textarea id="source-code-textarea" class="form-control" aria-label="With textarea" style="height: 300px;" ><%= sourceCode  %></textarea>
                 <button type="button" class="btn btn-success" id="preview" >Preview!</button>
             </div>
             <div class="col-md-8">
@@ -39,15 +39,15 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
         <script src="/static/js/app.js" ></script>
         <script>
-            $(function () {
-                var erdId = 'foobar'
-                var erdModel = new ErdModel({
-                    id: erdId,
-                })
+         $(function () {
+         })
+         var erdId = 'foobar'
+         var erdModel = new ErdModel({
+             id: erdId,
+         })
 
-                var appView = new AppView()
-                var erdView = new ErdView({ model: erdModel })
-            })
+         var appView = new AppView()
+         var erdView = new ErdView({ model: erdModel })
         </script>
     </body>
 </html>

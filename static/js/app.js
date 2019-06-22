@@ -14,12 +14,14 @@ var ErdModel = Backbone.Model.extend({
 });
 
 var AppView = Backbone.View.extend({
-    tagName: "body",
-    events: "",
+    el: "#app-view",
+    events: {
+        "click #preview": "onPreviewClicked",
+    },
 
     onPreviewClicked: function() {
-        console.log("in preview")
-        erdModel.save(); // let it compile,  // XXX 2 views tangled
+        erdModel.set("sourceCode", $("#source-code-textarea").val())
+        erdModel.save(); // compile it XXX 2 views tangled
     }
 });
 
