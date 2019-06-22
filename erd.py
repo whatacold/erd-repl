@@ -3,17 +3,14 @@
 
 import os
 import subprocess
-from flask import Flask
+import json
+
+from flask import Flask, redirect, request
 from flask import render_template
 
 app = Flask(__name__)
 
-@app.route('/compile')
-def gen_image():
-    pobj = subprocess.Popen([os.path.expanduser("~/.cabal/bin/erd"), "--fmt=png", "--edge=spline"],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE)
-    erd_source = '''
+default_erd_source = '''
 # Entities are declared in '[' ... ']'. All attributes after the entity header
 # up until the end of the file (or the next entity declaration) correspond
 # to this entity.
@@ -40,16 +37,41 @@ weight
 # 0 or more      *
 # 1 or more      +
 Person *--1 `Birth Place`
-    '''
-    pobj.stdin.write(erd_source.encode('utf-8'))
+'''
+
+def gen_image(source_code, image_path):
+    pobj = subprocess.Popen([os.path.expanduser("~/.cabal/bin/erd"), "--fmt=png", "--output=" + image_path],
+                            stdin=subprocess.PIPE,
+                            #stdout=subprocess.PIPE
+    )
+    pobj.stdin.write(source_code.encode('utf-8'))
     pobj.stdin.close()
     response = app.make_response(pobj.stdout.read())
     response.headers.set('Content-Type', 'image/png')
     return response
 
-@app.route('/erd')
+@app.route('/')
 def index():
-    return render_template('erd.html')
+    return redirect('/static/erd-repl.html')
+
+@app.route('/erds/<id>', methods=['GET', 'PUT'])
+def erd(id):
+    if "PUT" == request.method:
+        obj = json.loads(request.get_json())
+        path = "./static/erd-images/" + obj.id # TODO
+        gen_image(obj.sourceCode, path)
+
+        returnObj = {
+            "imageUri": '/static/erd-images/' + obj.id, # TODO
+        }
+        return json.dumps(returnObj)
+    else:
+        obj = {
+            "id": id,
+            "sourceCode": default_erd_source,
+            "imageUri": "/static/erd-images/" + id + ".png", # TODO
+        }
+        return json.dumps(obj)
 
 if __name__ == '__main__':
     app.run(debug=True)
