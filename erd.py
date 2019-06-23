@@ -5,6 +5,7 @@ import os
 import subprocess
 import json
 import random
+import time
 
 from flask import Flask, redirect, request
 from flask import render_template
@@ -35,6 +36,7 @@ def gen_image(source_code, image_path):
     )
     pobj.stdin.write(source_code.encode('utf-8'))
     pobj.stdin.close()
+    pobj.communicate() # XXX
     return
     response = app.make_response(pobj.stdout.read())
     response.headers.set('Content-Type', 'image/png')
@@ -48,11 +50,12 @@ def index():
 def erd(id):
     if "PUT" == request.method:
         obj = request.get_json() # TODO how to print debug log?
-        path = "./static/erd-images/" + obj["id"] + ".png" # TODO
+        imageFileName = obj["id"] + ".png"
+        path = "./static/erd-images/" + imageFileName # TODO
         gen_image(obj["sourceCode"], path)
 
         returnObj = {
-            "imageUri": '/static/erd-images/' + obj["id"] + ".png?" + str(random.randrange(1000000)), # TODO
+            "imageUri": '/static/erd-images/' + imageFileName + "?t=" + str(time.time()), # TODO
         }
         return json.dumps(returnObj)
     else:

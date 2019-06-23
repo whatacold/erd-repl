@@ -20,7 +20,7 @@ var AppView = Backbone.View.extend({
     },
 
     onPreviewClicked: function() {
-        erdModel.set("sourceCode", $("#source-code-textarea").val())
+        erdModel.set("sourceCode", $("#source-code-textarea").val()) // XXX text() not work
         erdModel.save(); // compile it XXX 2 views tangled
     }
 });
