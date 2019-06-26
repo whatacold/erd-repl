@@ -11,6 +11,12 @@
         <title>erd REPL</title>
     </head>
     <body id="app-view" >
+        <header>
+            <nav class="nav">
+                <a class="nav-link active" href="#">REPL</a>
+            </nav>
+        </header>
+
         <div class="container-fluid">
             <div class="row" id="erd-view" >
             </div>
@@ -18,9 +24,6 @@
 
         <script type="text/template" id="template-erd-view" >
             <div class="col-md-4" style="height: 800px;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">With textarea</span>
-                </div>
                 <textarea id="source-code-textarea" class="form-control" aria-label="With textarea" style="height: 300px;" ><%= sourceCode  %></textarea>
                 <button type="button" class="btn btn-success" id="preview" >Preview!</button>
             </div>
@@ -41,7 +44,7 @@
         <script>
          $(function () {
          })
-         var erdId = 'foobar'
+         var erdId = "{{ userid }}"
          var erdModel = new ErdModel({
              id: erdId,
          })
