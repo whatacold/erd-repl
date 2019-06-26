@@ -1,0 +1,3 @@
+[submodule "submodules/PythonUtils"]
+	path = submodules/PythonUtils
+	url = https://gitlab.com/whatacold/PythonUtils.git
