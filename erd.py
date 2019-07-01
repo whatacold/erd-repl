@@ -54,7 +54,7 @@ def index():
         userid = session["userid"]
         app.logger.debug("cookie userid: %s", userid)
     if len(userid) == 0:
-        userid = StringUtil.random_string()
+        userid = "user_" + str(time.time()) + StringUtil.random_string()
         session["userid"] = userid
         app.logger.debug("set userid in cookie: %s", userid)
     return render_template('erd-repl.html', userid=userid)
