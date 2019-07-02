@@ -19,10 +19,15 @@ var AppView = Backbone.View.extend({
         "click #preview": "onPreviewClicked",
     },
 
+    onPreviewError: function(model, response, options) {
+        this.$('.alert').text(response.responseJSON.error).show();
+    },
+
     onPreviewClicked: function() {
-        erdModel.set("sourceCode", $("#source-code-textarea").val()) // XXX text() not work
-        erdModel.save(); // compile it XXX 2 views tangled
-    }
+        this.$('.alert').hide();
+        erdModel.save({sourceCode: $("#source-code-textarea").val()},  // XXX .text() not work, so use .val()
+                      {error: this.onPreviewError}); // compile it XXX 2 views tangled
+    },
 });
 
 var ErdView = Backbone.View.extend({
@@ -34,7 +39,6 @@ var ErdView = Backbone.View.extend({
 
     template: _.template($("#template-erd-view").html()),
     render: function() { // reload image
-        console.log("render erd view...");
         this.$el.html(this.template(this.model.attributes));
     }
 });

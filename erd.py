@@ -11,7 +11,7 @@ sys.path.insert(0, "./submodules/")
 from PythonUtils import StringUtil
 
 from flask import Flask, redirect, request, session
-from flask import render_template
+from flask import render_template, jsonify
 
 app = Flask(__name__)
 app.secret_key = b"B\x9fT\x80/\xf1'\xda9\x1f\xa4\xec>0\x8c-" # os.urandom(16)
@@ -107,19 +107,57 @@ play        1--* play_player
 player      1--* play_player
 '''
 
+# copied from zapier transformer
+class APIError(Exception):
+    """ Base Exception for the API """
+    status_code = 400
+
+    def __init__(self, message, status_code=400, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        rv['status'] = self.status_code
+        return rv
+
 def gen_image(source_code, image_path):
     pobj = subprocess.Popen([os.path.expanduser("~/.cabal/bin/erd"), "--fmt=png", "--output=" + image_path],
                             stdin=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
                             #stdout=subprocess.PIPE
     )
     pobj.stdin.write(source_code.encode('utf-8'))
     #pobj.stdin.close()
-    pobj.communicate(timeout=1) # XXX Need this to wait subprocess to terminate
+    _, errInfo = pobj.communicate(timeout=1) # XXX Need this to wait subprocess to terminate
     app.logger.debug("popen return code: {}".format(pobj.returncode)) # TODO handle error
+    if pobj.returncode:
+        raise APIError("erd syntax error", payload={"error": errInfo.decode('utf-8')})
     return
+
     response = app.make_response(pobj.stdout.read())
     response.headers.set('Content-Type', 'image/png')
     return response
+
+@app.errorhandler(APIError)
+def error(e):
+    """ Handle our APIError exceptions """
+    response = jsonify(e.to_dict())
+    response.status_code = e.status_code
+    return response
+
+
+@app.errorhandler(Exception)
+def exception(e):
+    """ Handle generic exceptions """
+    response = jsonify(message=str(e))
+    response.status_code = 500
+    return response
+
 
 @app.route('/')
 def index():
