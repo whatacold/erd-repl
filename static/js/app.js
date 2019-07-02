@@ -1,6 +1,6 @@
 // Model and View definitions
 var ErdModel = Backbone.Model.extend({
-    urlRoot: "/erds/",
+    urlRoot: "/erd-repl/erds/",
 
     defaults: {
         id: '',

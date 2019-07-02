@@ -161,6 +161,10 @@ def exception(e):
 
 @app.route('/')
 def index():
+    return redirect('/erd-repl/')
+
+@app.route('/erd-repl/')
+def erd_repl():
     userid = ""
     if "userid" in session:
         userid = session["userid"]
@@ -171,7 +175,7 @@ def index():
         app.logger.debug("set userid in cookie: %s", userid)
     return render_template('erd-repl.html', userid=userid)
 
-@app.route('/erds/<userid>', methods=['GET', 'PUT'])
+@app.route('/erd-repl/erds/<userid>', methods=['GET', 'PUT'])
 def erd(userid):
     if "PUT" == request.method:
         obj = request.get_json()
