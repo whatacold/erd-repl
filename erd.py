@@ -7,8 +7,7 @@ import json
 import random
 import time
 import sys
-sys.path.insert(0, "./submodules/")
-from PythonUtils import StringUtil
+import string
 
 from flask import Flask, redirect, request, session
 from flask import render_template, jsonify
@@ -16,6 +15,13 @@ from flask import render_template, jsonify
 app = Flask(__name__)
 app.secret_key = b"B\x9fT\x80/\xf1'\xda9\x1f\xa4\xec>0\x8c-" # os.urandom(16)
 
+def random_string(len=12):
+    '''Generate a random string of LEN length, whose characters may
+    be ASCII characters and digits.'''
+    candidates = string.ascii_letters + string.digits
+    return ''.join(random.choice(candidates) for i in range(len))
+
+# TODO moved into some config
 default_erd_image = 'default.png'
 default_erd_source = '''
 title {label: "nfldb Entity-Relationship diagram (condensed)", size: "20"}
@@ -170,7 +176,7 @@ def erd_repl():
         userid = session["userid"]
         app.logger.debug("cookie userid: %s", userid)
     if len(userid) == 0:
-        userid = "user_" + str(time.time()) + StringUtil.random_string()
+        userid = "user_" + str(time.time()) + random_string()
         session["userid"] = userid
         app.logger.debug("set userid in cookie: %s", userid)
     return render_template('erd-repl.html', userid=userid)
