@@ -1,5 +1,6 @@
+
 SECRET_KEY = b"B\x9fT\x80/\xf1'\xda9\x1f\xa4\xec>0\x8c-" # os.urandom(16)
-ERD_BIN_PATH = "~/.cabal/bin/erd"
+ERD_BIN_PATH = "./bin/erd"
 DEFAULT_ERD_IMAGE = 'default.png'
 DEFAULT_ERD_SOURCE = '''
 title {label: "nfldb Entity-Relationship diagram (condensed)", size: "20"}
